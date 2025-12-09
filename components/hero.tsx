@@ -12,7 +12,7 @@ export function Hero() {
           alt="Caminhão na estrada"
           fill
           priority
-          className="object-cover object-left md:object-center"
+          className="object-cover object-[75%_center] md:object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-[60%]">
@@ -50,7 +50,7 @@ export function Hero() {
           </div>
 
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-[1.1] md:leading-[1.15] tracking-tight mb-6 md:mb-8 max-w-[22ch] md:max-w-[20ch]">
-            <span className="bg-gradient-to-r from-[#f97316] to-[#fbbf24] bg-clip-text text-transparent">A Força</span> <span className="text-foreground">e Precisão que</span>
+            <span className="bg-gradient-to-r from-[#f97316] to-[#fbbf24] bg-clip-text text-transparent">A Força</span> <span className="text-foreground">e Precisão que</span>{" "}
             <br className="hidden sm:block" />
             <span className="text-foreground">Seu Caminhão</span> <span className="bg-gradient-to-r from-[#f97316] to-[#fbbf24] bg-clip-text text-transparent">Precisa.</span>
           </h1>
@@ -61,9 +61,11 @@ export function Hero() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
-              Ver Produtos
-              <ArrowRight className="w-4 h-4" />
+            <Button size="lg" asChild className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
+              <a href="/catalogo">
+                Ver Produtos
+                <ArrowRight className="w-4 h-4" />
+              </a>
             </Button>
             <Button
               size="lg"
@@ -82,18 +84,18 @@ export function Hero() {
             </Button>
           </div>
 
-          <div className="mt-12 flex items-center gap-8">
+          <div className="mt-12 flex flex-wrap items-center gap-8">
             <div>
               <p className="text-3xl font-bold text-primary">15+</p>
               <p className="text-sm text-muted-foreground">Anos de Experiência</p>
             </div>
-            <div className="h-12 w-px bg-border" />
+            <div className="h-12 w-px bg-border hidden sm:block" />
             <div>
               <p className="text-3xl font-bold text-primary">5.000+</p>
               <p className="text-sm text-muted-foreground">Clientes Atendidos</p>
             </div>
             <div className="h-12 w-px bg-border hidden sm:block" />
-            <div className="hidden sm:block">
+            <div>
               <p className="text-3xl font-bold text-primary">100%</p>
               <p className="text-sm text-muted-foreground">Brasil Atendido</p>
             </div>
