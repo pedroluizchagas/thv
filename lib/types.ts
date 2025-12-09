@@ -29,6 +29,9 @@ export interface Product {
   unit: string
   brand: string | null
   application: string | null
+  photo1_url?: string | null
+  photo2_url?: string | null
+  photo3_url?: string | null
   is_active: boolean
   created_at: string
   updated_at: string

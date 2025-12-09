@@ -54,6 +54,7 @@ export function CatalogoClient({ initialProducts, categories }: CatalogoClientPr
   }, [totalPages, currentPage])
 
   const getImageSrc = (p: Product & { category?: Category }) => {
+    if (p.photo1_url) return p.photo1_url
     const s = p.category?.slug?.toLowerCase() || ""
     if (s.includes("bomba")) return "/hydraulic-pump-truck-part-industrial.jpg"
     if (s.includes("caixa")) return "/steering-gearbox-truck-industrial-part.jpg"
@@ -195,4 +196,3 @@ export function CatalogoClient({ initialProducts, categories }: CatalogoClientPr
     </div>
   )
 }
-

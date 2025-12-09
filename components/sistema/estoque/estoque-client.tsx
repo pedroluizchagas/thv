@@ -48,6 +48,8 @@ export function EstoqueClient({ initialProducts, categories }: EstoqueClientProp
   const [adjustQuantity, setAdjustQuantity] = useState<number>(0)
   const [adjustNotes, setAdjustNotes] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [imageFiles, setImageFiles] = useState<(File | null)[]>([null, null, null])
+  const [imagePreviews, setImagePreviews] = useState<string[]>(["", "", ""])
   const [formData, setFormData] = useState({
     code: "",
     name: "",
@@ -60,6 +62,9 @@ export function EstoqueClient({ initialProducts, categories }: EstoqueClientProp
     unit: "un",
     brand: "",
     application: "",
+    photo1_url: "",
+    photo2_url: "",
+    photo3_url: "",
     is_active: true,
   })
 
@@ -99,8 +104,17 @@ export function EstoqueClient({ initialProducts, categories }: EstoqueClientProp
         unit: product.unit,
         brand: product.brand || "",
         application: product.application || "",
+        photo1_url: product.photo1_url || "",
+        photo2_url: product.photo2_url || "",
+        photo3_url: product.photo3_url || "",
         is_active: product.is_active,
       })
+      setImageFiles([null, null, null])
+      setImagePreviews([
+        product.photo1_url || "",
+        product.photo2_url || "",
+        product.photo3_url || "",
+      ])
     } else {
       setEditingProduct(null)
       setFormData({
@@ -115,8 +129,13 @@ export function EstoqueClient({ initialProducts, categories }: EstoqueClientProp
         unit: "un",
         brand: "",
         application: "",
+        photo1_url: "",
+        photo2_url: "",
+        photo3_url: "",
         is_active: true,
       })
+      setImageFiles([null, null, null])
+      setImagePreviews(["", "", ""])
     }
     setIsDialogOpen(true)
   }
@@ -136,25 +155,81 @@ export function EstoqueClient({ initialProducts, categories }: EstoqueClientProp
 
     try {
       if (editingProduct) {
+        const uploadResults: { [k: string]: string } = {}
+        for (let i = 0; i < 3; i++) {
+          const file = imageFiles[i]
+          if (file && editingProduct.id) {
+            const ext = file.name.split(".").pop() || "jpg"
+            const path = `products/${editingProduct.id}/photo${i + 1}-${Date.now()}.${ext}`
+            const { error: upErr } = await supabase.storage.from("product-images").upload(path, file, {
+              upsert: true,
+            })
+            if (upErr) throw upErr
+            const { data: pub } = supabase.storage.from("product-images").getPublicUrl(path)
+            if (pub?.publicUrl) {
+              uploadResults[`photo${i + 1}_url`] = pub.publicUrl
+            }
+          }
+        }
+
         const { error } = await supabase
           .from("products")
-          .update({ ...formData, updated_at: new Date().toISOString() })
+          .update({ ...formData, ...uploadResults, updated_at: new Date().toISOString() })
           .eq("id", editingProduct.id)
 
         if (error) throw error
 
         const category = categories.find((c) => c.id === formData.category_id)
-        setProducts(products.map((p) => (p.id === editingProduct.id ? { ...p, ...formData, category } : p)))
+        setProducts(
+          products.map((p) =>
+            p.id === editingProduct.id ? { ...p, ...formData, ...uploadResults, category } : p,
+          ),
+        )
       } else {
         const { data, error } = await supabase
           .from("products")
-          .insert(formData)
-          .select("*, category:categories(*)")
+          .insert({ ...formData })
+          .select("*")
           .single()
 
         if (error) throw error
 
-        setProducts([...products, data])
+        const uploadResults: { [k: string]: string } = {}
+        for (let i = 0; i < 3; i++) {
+          const file = imageFiles[i]
+          if (file) {
+            const ext = file.name.split(".").pop() || "jpg"
+            const path = `products/${data.id}/photo${i + 1}-${Date.now()}.${ext}`
+            const { error: upErr } = await supabase.storage.from("product-images").upload(path, file, {
+              upsert: true,
+            })
+            if (upErr) throw upErr
+            const { data: pub } = supabase.storage.from("product-images").getPublicUrl(path)
+            if (pub?.publicUrl) {
+              uploadResults[`photo${i + 1}_url`] = pub.publicUrl
+            }
+          }
+        }
+
+        let newProduct = data
+        if (Object.keys(uploadResults).length > 0) {
+          const { data: updated, error: updErr } = await supabase
+            .from("products")
+            .update({ ...uploadResults, updated_at: new Date().toISOString() })
+            .eq("id", data.id)
+            .select("*, category:categories(*)")
+            .single()
+          if (updErr) throw updErr
+          newProduct = updated
+        } else {
+          const { data: withCat } = await supabase
+            .from("products")
+            .select("*, category:categories(*)")
+            .eq("id", data.id)
+            .single()
+          newProduct = withCat || data
+        }
+        setProducts([...products, newProduct])
       }
 
       setIsDialogOpen(false)
@@ -597,6 +672,37 @@ export function EstoqueClient({ initialProducts, categories }: EstoqueClientProp
                   checked={formData.is_active}
                   onCheckedChange={(v) => setFormData({ ...formData, is_active: v })}
                 />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-slate-300">Fotos do Produto (até 3)</Label>
+              <div className="grid sm:grid-cols-3 gap-4 mt-2">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="aspect-square bg-[#1e3a5f] border border-[#2d4a6f] rounded flex items-center justify-center overflow-hidden">
+                      {imagePreviews[i] ? (
+                        <img src={imagePreviews[i]} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="text-slate-400 text-sm">Sem foto</div>
+                      )}
+                    </div>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      className="bg-[#1e3a5f] border-[#2d4a6f]"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null
+                        const nextFiles = [...imageFiles]
+                        nextFiles[i] = file
+                        setImageFiles(nextFiles)
+                        const nextPrev = [...imagePreviews]
+                        nextPrev[i] = file ? URL.createObjectURL(file) : imagePreviews[i]
+                        setImagePreviews(nextPrev)
+                      }}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
