@@ -12,7 +12,7 @@ export function Hero() {
           alt="Caminhão na estrada"
           fill
           priority
-          className="object-cover object-[75%_center] md:object-center"
+          className="object-cover object-[80%_center] md:object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-[60%]">
@@ -84,20 +84,20 @@ export function Hero() {
             </Button>
           </div>
 
-          <div className="mt-12 flex flex-wrap items-center gap-8">
+          <div className="mt-12 flex items-center justify-between gap-4 md:gap-8">
             <div>
-              <p className="text-3xl font-bold text-primary">15+</p>
-              <p className="text-sm text-muted-foreground">Anos de Experiência</p>
+              <p className="text-xl md:text-3xl font-bold text-primary">15+</p>
+              <p className="text-xs md:text-sm text-muted-foreground">Anos de Experiência</p>
             </div>
-            <div className="h-12 w-px bg-border hidden sm:block" />
+            <div className="h-12 w-px bg-border hidden md:block" />
             <div>
-              <p className="text-3xl font-bold text-primary">5.000+</p>
-              <p className="text-sm text-muted-foreground">Clientes Atendidos</p>
+              <p className="text-xl md:text-3xl font-bold text-primary">5.000+</p>
+              <p className="text-xs md:text-sm text-muted-foreground">Clientes Atendidos</p>
             </div>
-            <div className="h-12 w-px bg-border hidden sm:block" />
+            <div className="h-12 w-px bg-border hidden md:block" />
             <div>
-              <p className="text-3xl font-bold text-primary">100%</p>
-              <p className="text-sm text-muted-foreground">Brasil Atendido</p>
+              <p className="text-xl md:text-3xl font-bold text-primary">100%</p>
+              <p className="text-xs md:text-sm text-muted-foreground">Brasil Atendido</p>
             </div>
           </div>
         </div>
