@@ -12,7 +12,7 @@ export function Hero() {
           alt="Caminhão na estrada"
           fill
           priority
-          className="object-cover object-[80%_center] md:object-center"
+          className="object-cover object-[70%_center] md:object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-[60%]">
