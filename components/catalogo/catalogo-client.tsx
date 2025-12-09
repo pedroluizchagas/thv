@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
-import { Search, Package } from "lucide-react"
+import { Search, Package, ChevronLeft, ChevronRight } from "lucide-react"
 import type { Product, Category } from "@/lib/types"
 
 interface CatalogoClientProps {
@@ -61,6 +61,48 @@ export function CatalogoClient({ initialProducts, categories }: CatalogoClientPr
     if (s.includes("cilindro")) return "/hydraulic-cylinder-truck-steering.jpg"
     if (s.includes("reparo")) return "/repair-kit-hydraulic-seals-orings.jpg"
     return "/placeholder.svg"
+  }
+
+  function ProductImageCarousel({ product }: { product: Product & { category?: Category } }) {
+    const images: string[] = [product.photo1_url || "", product.photo2_url || "", product.photo3_url || ""].filter(
+      (u) => !!u,
+    )
+    const fallback = getImageSrc(product)
+    const list = images.length > 0 ? images : [fallback]
+    const [idx, setIdx] = useState(0)
+    const prev = () => setIdx((i) => (i - 1 + list.length) % list.length)
+    const next = () => setIdx((i) => (i + 1) % list.length)
+    return (
+      <div className="relative aspect-square bg-secondary/50 flex items-center justify-center">
+        <img src={list[idx]} alt={product.name} className="w-full h-full object-contain" />
+        {list.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={prev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/60 hover:bg-background text-foreground"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={next}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/60 hover:bg-background text-foreground"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+              {list.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-2 w-2 rounded-full ${i === idx ? "bg-primary" : "bg-muted-foreground/40"}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -120,12 +162,8 @@ export function CatalogoClient({ initialProducts, categories }: CatalogoClientPr
               key={product.id}
               className="group bg-card border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-all"
             >
-              <div className="aspect-square bg-secondary/50 p-8 flex items-center justify-center">
-                <img
-                  src={getImageSrc(product)}
-                  alt={product.name}
-                  className="w-full h-full object-contain group-hover:scale-105 transition-transform"
-                />
+              <div className="overflow-hidden">
+                <ProductImageCarousel product={product} />
               </div>
               <div className="p-6">
                 <p className="text-xs text-muted-foreground">{product.code}</p>
