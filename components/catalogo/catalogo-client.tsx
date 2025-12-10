@@ -92,17 +92,25 @@ export function CatalogoClient({ initialProducts, categories }: CatalogoClientPr
             <button
               type="button"
               onClick={prev}
-              className={`absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/70 hover:bg-background text-primary transition-opacity opacity-0 group-hover:opacity-100 ${reveal ? "opacity-100" : ""}`}
+              className={`absolute left-2 top-1/2 -translate-y-1/2 p-2 text-primary transition-opacity opacity-0 group-hover:opacity-100 ${reveal ? "opacity-100" : ""}`}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               type="button"
               onClick={next}
-              className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/70 hover:bg-background text-primary transition-opacity opacity-0 group-hover:opacity-100 ${reveal ? "opacity-100" : ""}`}
+              className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary transition-opacity opacity-0 group-hover:opacity-100 ${reveal ? "opacity-100" : ""}`}
             >
               <ChevronRight className="w-5 h-5" />
             </button>
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+              {list.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-2 w-2 rounded-full ${i === idx ? "bg-primary" : "bg-muted-foreground/40"}`}
+                />
+              ))}
+            </div>
           </>
         )}
       </div>
