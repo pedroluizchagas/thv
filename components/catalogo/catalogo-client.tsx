@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
@@ -70,35 +70,39 @@ export function CatalogoClient({ initialProducts, categories }: CatalogoClientPr
     const fallback = getImageSrc(product)
     const list = images.length > 0 ? images : [fallback]
     const [idx, setIdx] = useState(0)
+    const [reveal, setReveal] = useState(false)
+    const revealTimer = useRef<any>(null)
     const prev = () => setIdx((i) => (i - 1 + list.length) % list.length)
     const next = () => setIdx((i) => (i + 1) % list.length)
+    const touchShow = () => {
+      setReveal(true)
+      if (revealTimer.current) clearTimeout(revealTimer.current)
+      revealTimer.current = setTimeout(() => setReveal(false), 2000)
+    }
     return (
-      <div className="relative aspect-square bg-secondary/50 flex items-center justify-center">
-        <img src={list[idx]} alt={product.name} className="w-full h-full object-contain" />
+      <div
+        className="relative aspect-square bg-secondary/50 flex items-center justify-center group"
+        onMouseLeave={() => setReveal(false)}
+        onTouchStart={touchShow}
+        onClick={touchShow}
+      >
+        <img src={list[idx]} alt={product.name} className="w-full h-full object-contain transition-transform group-hover:scale-105" />
         {list.length > 1 && (
           <>
             <button
               type="button"
               onClick={prev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/60 hover:bg-background text-foreground"
+              className={`absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/70 hover:bg-background text-primary transition-opacity opacity-0 group-hover:opacity-100 ${reveal ? "opacity-100" : ""}`}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               type="button"
               onClick={next}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/60 hover:bg-background text-foreground"
+              className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-background/70 hover:bg-background text-primary transition-opacity opacity-0 group-hover:opacity-100 ${reveal ? "opacity-100" : ""}`}
             >
               <ChevronRight className="w-5 h-5" />
             </button>
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
-              {list.map((_, i) => (
-                <span
-                  key={i}
-                  className={`h-2 w-2 rounded-full ${i === idx ? "bg-primary" : "bg-muted-foreground/40"}`}
-                />
-              ))}
-            </div>
           </>
         )}
       </div>
